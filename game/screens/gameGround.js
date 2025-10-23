@@ -7,6 +7,7 @@ export default function renderGameGround(data) {
       <h2 id="game-nickname-display">${data.nickname}</h2>
       <p>Tu rol es:</p>
       <h2 id="role-display">${data.role}</h2>
+      <h2 id="score-display" style="color: #76d275; margin-top: 1rem;">Puntuación: 0</h2>
       <h2 id="shout-display"></h2>
       <div id="pool-players"></div>
       <button id="shout-button">Gritar ${data.role}</button>
@@ -75,5 +76,26 @@ export default function renderGameGround(data) {
   // Keep socket.on listeners for game over notification
   socket.on("notifyGameOver", (data) => {
     navigateTo("/gameOver", { message: data.message, nickname });
+  });
+
+  // ⭐ NUEVO: Escuchar actualizaciones del leaderboard para mostrar puntuación
+  socket.on("leaderboardUpdate", (data) => {
+    const myPlayer = data.players.find(p => p.id === socket.id);
+    if (myPlayer) {
+      const scoreDisplay = document.getElementById("score-display");
+      if (scoreDisplay) {
+        scoreDisplay.innerHTML = `Puntuación: ${myPlayer.score || 0}`;
+        
+        scoreDisplay.style.transform = "scale(1.2)";
+        scoreDisplay.style.transition = "transform 0.3s ease";
+        setTimeout(() => {
+          scoreDisplay.style.transform = "scale(1)";
+        }, 300);
+      }
+    }
+  });
+
+  socket.on("gameReset", () => {
+    navigateTo("/lobby", { nickname, players: [] });
   });
 }
