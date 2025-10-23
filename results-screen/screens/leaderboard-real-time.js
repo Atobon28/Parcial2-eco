@@ -8,7 +8,10 @@ export default function renderScreen1() {
         <div id="leaderboard-container">
           <p>Esperando jugadores...</p>
         </div>
-        <button id="sort-alphabetical">Ordenar Alfabéticamente</button>
+        <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: center;">
+          <button id="sort-alphabetical">Ordenar Alfabéticamente</button>
+          <button id="reset-game-realtime">Limpiar</button>
+        </div>
       </div>
   `;
 
@@ -78,6 +81,25 @@ export default function renderScreen1() {
       );
       renderLeaderboard(sorted);
       sortButton.textContent = "Ordenar Alfabéticamente";
+    }
+  });
+
+  const resetButton = document.getElementById("reset-game-realtime");
+  resetButton.addEventListener("click", async () => {
+    if (confirm("¿Estás seguro de que deseas reiniciar el juego? Esto reseteará todas las puntuaciones.")) {
+      try {
+        const BASE_URL = "http://localhost:5050";
+        await fetch(`${BASE_URL}/api/game/reset`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        
+        // El evento gameReset manejará la actualización de la UI
+        console.log("Juego reiniciado exitosamente");
+      } catch (error) {
+        console.error("Error al reiniciar el juego:", error);
+        alert("Error al reiniciar el juego. Por favor, intenta nuevamente.");
+      }
     }
   });
 }
